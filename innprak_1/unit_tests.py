@@ -6,13 +6,14 @@ import pickle as pk
 
 
 class Testing(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
+    @classmethod
+    def setUpClass(cls):
         data = pd.read_csv('yahoo_389c_5047r.csv')
         prices = data.dropna(axis=1).set_index('Date')
         train_start_point = 3000
-        self.X = prices[train_start_point:]
-        self.assertIsNotNone(self.X)
-        super(Testing, self).__init__(*args, **kwargs)
+        cls.X = prices[train_start_point:]
+        print("lol")
+        cls.assertIsNotNone(cls, cls.X)
 
     def test_NMF_fit(self):
         X = self.X
