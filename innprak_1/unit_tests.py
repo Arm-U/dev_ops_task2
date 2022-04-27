@@ -6,17 +6,16 @@ import pickle as pk
 
 
 class Testing(unittest.TestCase):
-    def download_data(self):
+    def __init__(self, *args, **kwargs):
         data = pd.read_csv('yahoo_389c_5047r.csv')
         prices = data.dropna(axis=1).set_index('Date')
         train_start_point = 3000
-        X = prices[train_start_point:]
-        self.assertIsNotNone(X)
-        return X
+        self.X = prices[train_start_point:]
+        self.assertIsNotNone(self.X)
+        super(Testing, self).__init__(*args, **kwargs)
 
     def test_NMF_fit(self):
-        X = self.download_data()
-
+        X = self.X
         n_comp_list = [2, 3, 4]
         window_size_list = [5, 10]
 
@@ -33,8 +32,7 @@ class Testing(unittest.TestCase):
                 self.assertLogs("fit error, error message: " + e)
 
     def test_NPCA_fit(self):
-        X = self.download_data()
-
+        X = self.X
         n_comp_list = [2, 3, 4]
         window_size_list = [5, 10]
 
@@ -51,8 +49,7 @@ class Testing(unittest.TestCase):
                 self.assertLogs("fit error, error message: " + e)
 
     def test_NPCA_shape(self):
-        X = self.download_data()
-
+        X = self.X
         n_comp_list = [2, 3, 4]
         window_size_list = [5, 10]
 
@@ -64,7 +61,7 @@ class Testing(unittest.TestCase):
                 self.assertEqual(X_reduced.shape[1], X.shape[1])
                 self.assertEqual(window_size * X_reduced.shape[0] + (X.shape[0] % window_size), X.shape[0])
 
-    def test_not_neg(self, X):
+    def _test_not_neg(self, X):
         not_neg = X < 0
         for array in not_neg:
             for elem in array:
@@ -79,7 +76,7 @@ class Testing(unittest.TestCase):
                 with open(f"models/NMF_{str(n_comp)}_{str(window_size)}.pkl", "rb") as file:
                     NMF = pk.load(file)
                 X_reduced = NMF.nmf_prices
-                self.test_not_neg(X_reduced)
+                self._test_not_neg(X_reduced)
 
     def test_NPCA_not_neg(self):
         n_comp_list = [2, 3, 4]
@@ -90,7 +87,7 @@ class Testing(unittest.TestCase):
                 with open(f"models/NPCA_{str(n_comp)}_{str(window_size)}.pkl", "rb") as file:
                     NPCA = pk.load(file)
                 X_reduced = NPCA.npca_prices
-                self.test_not_neg(X_reduced)
+                self._test_not_neg(X_reduced)
 
 
 if __name__ == '__main__':
