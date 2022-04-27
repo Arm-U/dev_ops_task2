@@ -12,7 +12,6 @@ class Testing(unittest.TestCase):
         prices = data.dropna(axis=1).set_index('Date')
         train_start_point = 3000
         cls.X = prices[train_start_point:]
-        print("lol")
         cls.assertIsNotNone(cls, cls.X)
 
     def test_NMF_fit(self):
